@@ -19,7 +19,7 @@ int main(){
     {
         X=0;
         scanf("%d %d %d",&L,&M,&F);
-        printf("%d %d %d \n",L,M,F);
+        //printf("%d %d %d \n",L,M,F);
         if(F!=1)scanf("%d",&X);
         functions[i].L=L;
         functions[i].M=M;
