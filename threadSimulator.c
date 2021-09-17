@@ -1,6 +1,7 @@
 #include "coroutine.h"
 #include <math.h>
-#define N 1024
+#include <unistd.h>
+#define N 2048
 
 int totalTickets;
 int T;
@@ -70,13 +71,42 @@ void iterate(void* p) {
     }
   }
 }
+
+void _sin(void* p){
+    Function* f = (Function*)p;
+    long double n,m;
+    long double d,div;
+    int signo = -1;
+    for(n=0; n <= f->M ; n++){
+        d = 1;
+        for(m = 0; m < 2*n+1 ; m++){
+            d = d * f->X;
+        }
+        div = 1;
+        for(m = 1; m <= 2*n+1 ; m++){
+            div = d * m;
+        }
+        signo *= -1;
+        f->sum+= (d / div) * signo;
+        yield(f->c);     
+          
+    }
+    done++;
+}
+
 void napierian(void* p){
     Function* f = (Function*)p;
     long double n;
+    int signo = 1;
+    long upper = 1;
     for(n = 1; n <= f -> M; n++){
-        f->sum+=(pow(-1,n+1)*pow(f->X,n))/n; //de interney
-        //f->sum+=pow(-1,n+1*(pow(f->X,n))/n); //de eddy
+       
+        upper*= f->X;
+        f->sum+= (upper / n) * signo;
+
+        signo *= 1;
         yield(f->c);
+        
     }
     //agregar al struct un done
     done++;
@@ -114,7 +144,6 @@ int chooseRandom(){ // Preguntarle a eddy si se puede repetir un ticket
     return 0;
 }
 
-
 int main(){
     srand(time(NULL));   // Seed para el random
     readConsole();
@@ -122,12 +151,14 @@ int main(){
 
     start(functions[0].c, &pi, &functions[0], stacks[0].stack+N);
     while(next(functions[0].c)) {
-        printf("%Lf \n", functions[0].sum);
+        printf("%LE \n", functions[0].sum);
     }
-    //printf("------------------------------------\n");
+    printf("------------------------------------\n");
+    printf("------------------------------------\n");
     start(functions[1].c, &napierian, &functions[1], stacks[1].stack+N);
     while(next(functions[1].c)) {
-        printf("%Lf \n", functions[1].sum);
+        printf("%LE \n", functions[1].sum);
+ 
     }
 
 
