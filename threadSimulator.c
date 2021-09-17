@@ -1,7 +1,9 @@
 #include "coroutine.h"
+#define N 1024
 
 int totalTickets;
 int T;
+
 
 typedef struct Function{
     coroutine* c;
@@ -12,6 +14,10 @@ typedef struct Function{
     long double sum;
 } Function;
 
+typedef struct Stack{
+    int stack[N];
+} Stack;
+
 typedef struct {
     coroutine* c;
     int max_x, max_y;
@@ -19,14 +25,16 @@ typedef struct {
 } iter;
 
 Function *functions;
+Stack *stacks;
 
 void readConsole(){
     int L,F,X;
     long int M;
     totalTickets = 0;
-
     scanf("%d",&T);
-    functions =  (Function*) malloc(T * sizeof(Function)); // Tiene que haber un puntero de stacks
+    functions =  (Function*) malloc(T * sizeof(Function)); 
+    stacks = (Stack*) malloc(T * sizeof(Stack)); 
+
 
     for(int i = 0; i < T; i++)
     {
@@ -82,14 +90,13 @@ int chooseRandom(){ // Preguntarle a eddy si se puede repetir un ticket
     return 0;
 }
 
-#define N 1024
 
 int main(){
     srand(time(NULL));   // Seed para el random
     readConsole();
 
-    // coroutine c;
-    // int stack[N]; // Tiene que haber un puntero de stacks
+    //coroutine c;
+    //int stack[N]; // Tiene que haber un puntero de stacks
     // iter it = {&c, 2, 2};
     // start(&c, &iterate, &it, stack+N);
     // while(next(&c)) {
@@ -97,5 +104,6 @@ int main(){
     // }
 
     free(functions);
+    free(stacks);
     return 0;
 }
