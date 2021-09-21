@@ -373,9 +373,9 @@ int main(int argc, char* argv[])
 
     g_timeout_add(10,(GSourceFunc)lotteryLoop,NULL);
     gtk_widget_show_all(window);
-	gtk_main();
-    
-
+    gtk_main();
+    //gcc gui.c -o GUI `pkg-config --cflags gtk+-3.0` `pkg-config --libs gtk+-3.0` AGREGAR ESTO AL MAKEFILE
+    //sudo apt-get install libgtk-3-dev PARA USAR LA GUI
     free(functions);
     free(stacks);
 	return 0;
