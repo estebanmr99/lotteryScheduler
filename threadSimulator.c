@@ -7,7 +7,7 @@
 
 int totalTickets;
 int T;
-int done = 1;
+int done = 0;
 
 GtkWidget *window;
 GtkWidget *grid;
@@ -40,7 +40,7 @@ Stack *stacks;
 GtkWidget *createWindow(int width,int height){
     GtkWidget *window;
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(window),"TEST");
+    gtk_window_set_title(GTK_WINDOW(window),"TAYLOR SERIES");
     g_signal_connect(window,"destroy",gtk_main_quit,window);
     gtk_window_set_default_size(GTK_WINDOW(window),width,height);
     gtk_container_set_border_width(GTK_CONTAINER(window),50);
@@ -104,8 +104,10 @@ void set_fract_callback(Function *function){
         }
         else{
             if(label!=NULL){
+                gchar *buffer1 = g_strdup_printf("DONE  Sum: %0.9Le",function->sum);
                 gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progressBar),"100%");
-                gtk_label_set_label(label,"Done");
+                gtk_label_set_label(label,buffer1);
+                g_free(buffer1);
             }
             gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progressBar),fraction);
         }
@@ -330,17 +332,18 @@ void startLottery(){
 }
 gboolean lotteryLoop(){
     
-    if(done<=25){
-        int choosedFunc = 0;
-        choosedFunc = chooseFunction();
-        next(functions[choosedFunc].c);
-        gui();
-        printf("done: %d\n",done);
-        return TRUE;
-        
-    
+    if(done>=T){
+        printf("termino\n");
+        return FALSE;
     }
-    return FALSE;
+    int choosedFunc = 0;
+    choosedFunc = chooseFunction();
+    next(functions[choosedFunc].c);
+
+    //gui();
+    //printf("done: %d\n",done);
+    
+    return TRUE;
  
 }
 
@@ -361,21 +364,15 @@ int main(int argc, char* argv[])
     gtk_container_add(GTK_CONTAINER(window),grid);
    
 
-
-
-    srand(time(NULL));   // Seed para el random
+    srand(time(NULL));   
     readConsole();
-
     startLottery();
 
+    g_timeout_add(1,(GSourceFunc)lotteryLoop,NULL);
 
-    
-
-    g_timeout_add(10,(GSourceFunc)lotteryLoop,NULL);
     gtk_widget_show_all(window);
     gtk_main();
-    //gcc gui.c -o GUI `pkg-config --cflags gtk+-3.0` `pkg-config --libs gtk+-3.0` AGREGAR ESTO AL MAKEFILE
-    //sudo apt-get install libgtk-3-dev PARA USAR LA GUI
+
     free(functions);
     free(stacks);
 	return 0;
