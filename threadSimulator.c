@@ -28,8 +28,8 @@ void readConsole(){
     long int M;
     totalTickets = 0;
     scanf("%d",&T);
-    functions =  (Function*) malloc(T * sizeof(Function)); 
-    stacks = (Stack*) malloc(T * sizeof(Stack)); 
+    functions =  (Function*) malloc(T * sizeof(Function));
+    stacks = (Stack*) malloc(T * sizeof(Stack));
 
     for(int i = 0; i < T; i++)
     {
@@ -38,7 +38,7 @@ void readConsole(){
 
         if(F != 1)
             scanf("%d", &X);
-        
+
         totalTickets += L;
         functions[i].c = (coroutine*) malloc(sizeof(coroutine));
         functions[i].L = L;
@@ -53,7 +53,7 @@ void readConsole(){
 }
 
 void pi(void* p){
-  
+
     Function* f = (Function*)p;
     long double n;
     for(n = 1; n <= f -> M; n++){
@@ -83,12 +83,35 @@ void napierian(void* p){
 
         signo *= -1;
         yield(f->c);
-        
+
     }
 }
 
 void euler(void* p){ // EL factorial no debe de calcularse a mas de 1754
-    done++;
+    Function* f = (Function*)p;
+    long double n,m;
+    long double d,div;
+    for (n = 0; n <= f -> M; n++) {
+        if (n == f->M) {
+            done++;
+            totalTickets -= f -> L;
+            f -> L = 0;
+        }
+        d = 1;
+        for (m = 0; m < n; m++) {
+            d = d * f->X;
+        }
+        div = 1;
+        long double newN = n;
+        if (newN > (long double)1753) {
+            newN = (long double)1754;
+        }
+        for (m = 1; m < newN; m++) {
+            div = div * m;
+        }
+        f->sum+= (d / div);
+        yield(f->c);
+    }
 }
 
 void _sin(void* p){
@@ -116,7 +139,7 @@ void _sin(void* p){
         }
         signo *= -1;
         f->sum+= (d / div) * signo;
-        yield(f->c);     
+        yield(f->c);
     }
 }
 
