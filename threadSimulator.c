@@ -87,11 +87,11 @@ void napierian(void* p){
     }
 }
 
-void euler(void* p){ // Que vergas hacer con el factorial a partir de 50
+void euler(void* p){ // EL factorial no debe de calcularse a mas de 1754
     done++;
 }
 
-void _sin(void* p){ // Que vergas hacer con el factorial a partir de 50
+void _sin(void* p){
     Function* f = (Function*)p;
     long double n,m;
     long double d,div;
@@ -107,8 +107,12 @@ void _sin(void* p){ // Que vergas hacer con el factorial a partir de 50
             d = d * f->X;
         }
         div = 1;
-        for(m = 1; m <= 2*n+1 ; m++){
-            div = d * m;
+        long double newN = 2*n+1; // EL factorial no debe de calcularse a mas de 1754
+        if (newN > (long double)1753){
+            newN = (long double)1754;
+        }
+        for(m = 1; m <= newN; m++){
+            div = div * m;
         }
         signo *= -1;
         f->sum+= (d / div) * signo;
@@ -116,17 +120,8 @@ void _sin(void* p){ // Que vergas hacer con el factorial a partir de 50
     }
 }
 
-int chooseFunction(){ // Preguntarle a eddy si se puede repetir un ticket
+int chooseFunction(){
     int ticketSelected = rand() % ((totalTickets - 1) + 1) + 1;
-    
-    // int flag = 1;
-    // int ticketSelected = 0;
-    // while(flag){
-    //     ticketSelected = rand() % ((totalTickets - 1) + 1) + 1;
-    //     flag = tickets[ticketSelected];
-    // }
-    // tickets[ticketSelected] = 1;
-
     int sum = 0;
     for (int i = 0; i < T; i++){
         sum += functions[i].L;
@@ -134,13 +129,12 @@ int chooseFunction(){ // Preguntarle a eddy si se puede repetir un ticket
             return i;
         }
     }
-
     return 0;
 }
 
-void gui(){
+void gui(){  // Preguntar cuanto deberia ser el maximo de numeros que se muestran (porque se pueden mil)
     for(int i = 0; i < T; i++){
-        printf("%Lf \n", functions[i].sum);
+        printf("%0.9Le \n", functions[i].sum);
     }
     printf("------------------------------------\n");
     printf("------------------------------------\n");
