@@ -16,7 +16,8 @@ typedef struct ProgressBars{
     GtkWidget *bar;
     GtkWidget *label;
     GtkWidget *overlay;
-    GtkWidget *button;
+    GtkWidget *widget;
+    GtkWidget *progress;
 }ProgressBars;
 
 typedef struct Function{
@@ -67,6 +68,27 @@ void load_css(){
 
 }
 
+void updateSum(Function *function){
+    GtkOverlay *overlay = GTK_OVERLAY(function->bar->overlay);
+    GtkWidget *progressBar = gtk_bin_get_child(GTK_BIN(overlay));
+    GtkLabel *label = NULL;
+    GList *children = gtk_container_get_children(GTK_CONTAINER(overlay));
+
+    while(children){
+        if(GTK_IS_LABEL(children->data)){
+            label = children->data;
+            break;
+        }
+        children = children->next;
+    }
+
+    gdouble fraction = gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(progressBar));
+    gchar *buffer = g_strdup_printf("Progress: %.0f%%  Sum: %0.9Le",fraction*100,function->sum);
+    gtk_label_set_label(label,buffer);
+    g_free(buffer);
+}
+
+
 void set_fract_callback(Function *function){
     //printf("hoooollaaa");
     GtkOverlay *overlay = GTK_OVERLAY(function->bar->overlay);
@@ -74,6 +96,7 @@ void set_fract_callback(Function *function){
     GtkLabel *label = NULL;
     GList *children = gtk_container_get_children(GTK_CONTAINER(overlay));
     gdouble fraction = 0.0;
+
 
     while(children){
         if(GTK_IS_LABEL(children->data)){
@@ -157,13 +180,16 @@ void readConsole(){
         functions[i].bar->bar = gtk_progress_bar_new();
         functions[i].bar->overlay = gtk_overlay_new();
         functions[i].bar->label = gtk_label_new("progressing...0%");
-        functions[i].bar->button = gtk_button_new_with_mnemonic("Click");
+        functions[i].bar->widget = gtk_button_new_with_mnemonic("Click");
+        functions[i].bar->progress = gtk_button_new_with_mnemonic("Click");
         g_object_set(functions[i].bar->bar,"margin-top",15,NULL);
         g_object_set(functions[i].bar->overlay, "margin-top",15,NULL);
         gtk_grid_attach(GTK_GRID(grid),functions[i].bar->overlay,0,i,1,1);
         gtk_container_add(GTK_CONTAINER(functions[i].bar->overlay),functions[i].bar->bar);
         gtk_overlay_add_overlay(GTK_OVERLAY(functions[i].bar->overlay),functions[i].bar->label);
-        g_signal_connect_swapped(functions[i].bar->button,"clicked",G_CALLBACK(set_fract_callback),(gpointer)&functions[i]);
+        g_signal_connect_swapped(functions[i].bar->widget,"clicked",G_CALLBACK(set_fract_callback),(gpointer)&functions[i]);
+        g_signal_connect_swapped(functions[i].bar->progress,"clicked",G_CALLBACK(updateSum),(gpointer)&functions[i]);
+
     }        
     
     //for(int i = 0; i < T; i++)
@@ -183,10 +209,10 @@ void pi(void* p){
         f->sum += 1/(n*n);
 
         if(i==f->n){
-            gtk_button_clicked(GTK_BUTTON(f->bar->button));
+            gtk_button_clicked(GTK_BUTTON(f->bar->widget));
             i=0;
         }
-       
+        else    gtk_button_clicked(GTK_BUTTON(f->bar->progress));
         
         yield(f->c);
     }
@@ -209,11 +235,11 @@ void napierian(void* p){
 
         signo *= -1;
         if(i==f->n){
-            gtk_button_clicked(GTK_BUTTON(f->bar->button));
+            gtk_button_clicked(GTK_BUTTON(f->bar->widget));
             i=0;
         }
 
-        
+        else    gtk_button_clicked(GTK_BUTTON(f->bar->progress));
         //gtk_button_clicked(GTK_BUTTON(f->bar->button));
         
         yield(f->c);
@@ -246,11 +272,11 @@ void euler(void* p){ // EL factorial no debe de calcularse a mas de 1754
         }
         f->sum+= (d / div);
         if(i==f->n){
-            gtk_button_clicked(GTK_BUTTON(f->bar->button));
+            gtk_button_clicked(GTK_BUTTON(f->bar->widget));
             i=-1;
         }
         //gtk_button_clicked(GTK_BUTTON(f->bar->button));
-        
+        else    gtk_button_clicked(GTK_BUTTON(f->bar->progress));
         yield(f->c);
     }
 }
@@ -282,11 +308,10 @@ void _sin(void* p){
         signo *= -1;
         f->sum+= (d / div) * signo;
         if(i==f->n){
-            gtk_button_clicked(GTK_BUTTON(f->bar->button));
+            gtk_button_clicked(GTK_BUTTON(f->bar->widget));
             i=-1;
         }
- 
-        //gtk_button_clicked(GTK_BUTTON(f->bar->button));
+        else    gtk_button_clicked(GTK_BUTTON(f->bar->progress));
         
         yield(f->c);
     }
@@ -331,7 +356,6 @@ void startLottery(){
 
 }
 gboolean lotteryLoop(){
-    
     if(done>=T){
         printf("termino\n");
         return FALSE;
