@@ -7,7 +7,7 @@ TARGETC=threadSimulator
 all: c
 
 c:
-	$(CC) $(SOURCEC) -o $(TARGETC)
+	$(CC) $(SOURCEC) -o $(TARGETC) `pkg-config --cflags gtk+-3.0` `pkg-config --libs gtk+-3.0`
 
 clean:
 	-rm -f *.o

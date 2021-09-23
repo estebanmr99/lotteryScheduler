@@ -249,7 +249,7 @@ void napierian(void* p){
 
 void euler(void* p){ // EL factorial no debe de calcularse a mas de 1754
     Function* f = (Function*)p;
-    long int i = 0;
+    long int i = 1;
     long double m,n;
     long double d,div;
     for (n = 0; n <= f -> M; n++,i++) {
@@ -267,13 +267,13 @@ void euler(void* p){ // EL factorial no debe de calcularse a mas de 1754
         if (newN > (long double)1753) {
             newN = (long double)1754;
         }
-        for (m = 1; m < newN; m++) {
+        for (m = 1; m <= newN; m++) {
             div = div * m;
         }
-        f->sum+= (d / div);
-        if(i==f->n){
+        f->sum += (d / div);
+        if(i == f->n){
             gtk_button_clicked(GTK_BUTTON(f->bar->widget));
-            i=-1;
+            i = 0;
         }
         //gtk_button_clicked(GTK_BUTTON(f->bar->button));
         else    gtk_button_clicked(GTK_BUTTON(f->bar->progress));
@@ -283,7 +283,7 @@ void euler(void* p){ // EL factorial no debe de calcularse a mas de 1754
 
 void _sin(void* p){
     Function* f = (Function*)p;
-    long int i = 0;
+    long int i = 1;
     long double m,n;
     long double d,div;
     int signo = -1;
@@ -309,9 +309,9 @@ void _sin(void* p){
         f->sum+= (d / div) * signo;
         if(i==f->n){
             gtk_button_clicked(GTK_BUTTON(f->bar->widget));
-            i=-1;
+            i=0;
         }
-        else    gtk_button_clicked(GTK_BUTTON(f->bar->progress));
+        else gtk_button_clicked(GTK_BUTTON(f->bar->progress));
         
         yield(f->c);
     }
@@ -331,7 +331,7 @@ int chooseFunction(){
 
 void gui(){  // Preguntar cuanto deberia ser el maximo de numeros que se muestran (porque se pueden mil)
     for(int i = 0; i < T; i++){
-        printf("%0.9Le \n", functions[i].sum);
+        printf("%Lf \n", functions[i].sum);
     }
     printf("------------------------------------\n");
     printf("------------------------------------\n");
@@ -357,14 +357,14 @@ void startLottery(){
 }
 gboolean lotteryLoop(){
     if(done>=T){
-        printf("termino\n");
+        printf("END\n");
         return FALSE;
     }
     int choosedFunc = 0;
     choosedFunc = chooseFunction();
     next(functions[choosedFunc].c);
 
-    //gui();
+    // gui();
     //printf("done: %d\n",done);
     
     return TRUE;
@@ -373,10 +373,7 @@ gboolean lotteryLoop(){
 
 int main(int argc, char* argv[])
 {
-    
-
 	gtk_init(&argc, &argv);
-	
    
     load_css();
 
@@ -386,7 +383,6 @@ int main(int argc, char* argv[])
     gtk_grid_set_column_homogeneous(GTK_GRID(grid),TRUE);
     gtk_grid_set_row_homogeneous(GTK_GRID(grid),FALSE);
     gtk_container_add(GTK_CONTAINER(window),grid);
-   
 
     srand(time(NULL));   
     readConsole();
