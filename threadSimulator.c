@@ -77,10 +77,7 @@ void set_fract_callback(Function *function){
     if(GTK_IS_PROGRESS_BAR(progressBar)){
         fraction = gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(progressBar));
         fraction += 0.01;
-        PangoEllipsizeMode ellipSize = gtk_progress_bar_get_ellipsize(GTK_PROGRESS_BAR(progressBar));
-        if(ellipSize == PANGO_ELLIPSIZE_NONE){
-            gtk_progress_bar_set_ellipsize(GTK_PROGRESS_BAR(progressBar),PANGO_ELLIPSIZE_END);
-        }
+
         gchar *buffer = g_strdup_printf("Progress: %.0f%%  Sum: %0.9Le",fraction*100,function->sum);
         if(fraction< 1.0){
             if(label!=NULL){
